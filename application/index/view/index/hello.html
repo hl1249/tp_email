@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script>
+			const data = [];
+			const data2 = [];
+			let prev = 0;
+			let prev2 = 80;
+
+			let zzz = 0
+			for (let i = 0; i < 1000; i++) {
+				if (i >= 250 && i < 300) {
+
+					if (i > 250 && i < 270) {
+						zzz += 3
+						prev = 5 - Math.random() * 10 + 160 + zzz
+					} else if (i >= 270 && i <= 280) {
+						zzz = zzz
+						prev = 5 - Math.random() * 10 + 160 + zzz
+					} else {
+						zzz = zzz - 3
+						prev = 5 - Math.random() * 10 + 160 + zzz
+					}
+
+				} else if (i >= 300 && i < 310) {
+					prev = 5 - Math.random() * 10;
+				} else if( i >310 && i < 360){
+					
+					if (i > 310 && i < 330) {
+						zzz += 3
+						prev = 5 - Math.random() * 10 + 220 + zzz
+					} else if (i >= 330 && i <= 340) {
+						zzz = zzz
+						prev = 5 - Math.random() * 10 + 220 + zzz
+					} else {
+						zzz = zzz - 3
+						prev = 5 - Math.random() * 10 + 220 + zzz
+					}
+					
+				}else if (i >= 360 && i < 370){
+					prev = 5 - Math.random() * 10;
+				} else if( i >360 && i < 430){
+					
+					if (i > 360 && i < 380) {
+						zzz += 3
+						prev = 5 - Math.random() * 10 + 450 + zzz
+					} else if (i >= 380 && i <= 400) {
+						zzz = zzz
+						prev = 5 - Math.random() * 10 + 450 + zzz
+					} else {
+						zzz = zzz - 3
+						prev = 5 - Math.random() * 10 + 450 + zzz
+					}
+					
+				}else if (i >= 430 && i < 440){
+					prev = 5 - Math.random() * 10;
+				}else if( i >440 && i < 490){
+					
+					if (i > 440 && i < 460) {
+						zzz += 3
+						prev = 5 - Math.random() * 10 + 250 + zzz
+					} else if (i >= 460 && i <= 490) {
+						zzz = zzz
+						prev = 5 - Math.random() * 10 + 250 + zzz
+					} else {
+						zzz = zzz - 3
+						prev = 5 - Math.random() * 10 + 250 + zzz
+					}
+					
+				}else if (i >= 495 && i < 500){
+					prev = 5 - Math.random() * 10;
+				}else if( i >500 && i < 530){
+					
+					// if (i > 500 && i < 520) {
+					// 	zzz += 3
+					// 	prev = 5 - Math.random() * 10 + 160 + zzz
+					// } else if (i >= 520 && i <= 530) {
+					// 	zzz = zzz
+					// 	prev = 5 - Math.random() * 10 + 160 + zzz
+					// } else {
+						zzz = zzz - 3
+						prev = 5 - Math.random() * 10 + 160 + zzz
+					// }
+					
+				}else if (i >= 530 && i < 540){
+					prev = 5 - Math.random() * 10;
+				}else{
+					prev += 5 - Math.random() * 10;
+				}
+				// prev += 5 - Math.random() * 10;
+				data.push({
+					x: i,
+					y: prev
+				});
+				prev2 += 5 - Math.random() * 10;
+				data2.push({
+					x: i,
+					y: prev2
+				});
+			}
+
+			const totalDuration = 10000;
+			const delayBetweenPoints = totalDuration / data.length;
+			const previousY = (ctx) => ctx.index === 0 ? ctx.chart.scales.y.getPixelForValue(100) : ctx.chart.getDatasetMeta(ctx
+				.datasetIndex).data[ctx.index - 1].getProps(['y'], true).y;
+			const animation = {
+				x: {
+					type: 'number',
+					easing: 'linear',
+					duration: delayBetweenPoints,
+					from: NaN, // the point is initially skipped
+					delay(ctx) {
+						if (ctx.type !== 'data' || ctx.xStarted) {
+							return 0;
+						}
+						ctx.xStarted = true;
+						return ctx.index * delayBetweenPoints;
+					}
+				},
+				y: {
+					type: 'number',
+					easing: 'linear',
+					duration: delayBetweenPoints,
+					from: previousY,
+					delay(ctx) {
+						if (ctx.type !== 'data' || ctx.yStarted) {
+							return 0;
+						}
+						ctx.yStarted = true;
+						return ctx.index * delayBetweenPoints;
+					}
+				}
+			};
+
+			const plugin = {
+				id: 'custom_canvas_background_color',
+				beforeDraw: (chart) => {
+					const ctx = chart.canvas.getContext('2d');
+					ctx.save();
+					ctx.globalCompositeOperation = 'destination-over';
+					ctx.fillStyle = "#282c34";
+					ctx.fillRect(0, 0, chart.width, chart.height);
+					ctx.restore();
+				}
+			};
+
+			const config = {
+				type: 'line',
+				data: {
+					datasets: [{
+							borderColor: "red",
+							borderWidth: 1,
+							radius: 0,
+							data: data,
+						},
+						{
+							borderColor: "green",
+							borderWidth: 1,
+							radius: 0,
+							data: data2,
+						}
+					]
+				},
+				plugins: [plugin],
+				options: {
+					elements: {
+						borderColor: 'pink',
+						backgroundColor: 'pink'
+					},
+					animation,
+					interaction: {
+						intersect: false
+					},
+					plugins: {
+						legend: false
+					},
+					scales: {
+						x: {
+							type: 'linear',
+							grid: {
+								color: '#464053'
+							}
+						},
+
+						y: {
+							type: 'linear',
+							grid: {
+								color: '#464053'
+							}
+						}
+					}
+				}
+			};
+		</script>
+
+		<title></title>
+	</head>
+	<body>
+		<div>
+			<canvas id="myChart"></canvas>
+		</div>
+		<script>
+			const myChart = new Chart(
+				document.getElementById('myChart'),
+				config
+			);
+		</script>
+	</body>
+</html>
+
+<style type="text/css" media="all">
+*{
+    margin: auto;
+    padding: 0;;
+}
+    
+</style>
